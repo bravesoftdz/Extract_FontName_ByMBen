@@ -1,0 +1,86 @@
+unit Main.View;
+
+interface
+
+uses
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs, Vcl.StdCtrls;
+
+type
+  TMainView = class(TForm)
+    Btn_ExtractFontName: TButton;
+    FileOpenDlg_Font: TFileOpenDialog;
+    Lbl_FName: TLabel;
+    Lbl_1: TLabel;
+    procedure Btn_ExtractFontNameClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  MainView: TMainView;
+
+implementation
+
+{$R *.dfm}
+
+const
+  FR_PRIVATE = $10;
+  GFRI_DESCRIPTION = 1;
+  GFRI_LOGFONTS = 2;
+  GFRI_NUMFACES = 3;
+
+function GetFontResourceInfoW(lpszFilename: PWideChar; var cbBuffer: DWORD; lpBuffer: Pointer; dwQueryType: DWORD): BOOL; stdcall; external gdi32 name 'GetFontResourceInfoW';
+
+
+function GetFontNameFromFile(const FontFileName: string): string;
+var
+  FontPath: PChar;
+  Buffer: array[0..255] of Char;
+  BufferSize: DWORD;
+  FontCount: Integer;
+begin
+  Result := '';
+  FontPath := PChar(FontFileName);
+
+  // Add font resource
+  FontCount := AddFontResourceEx(FontPath, FR_PRIVATE, nil);
+  if FontCount = 0 then
+    raise Exception.Create('Failed to add font resource');
+
+  try
+    BufferSize := SizeOf(Buffer);
+    if GetFontResourceInfoW(FontPath, BufferSize, @Buffer, GFRI_DESCRIPTION) then
+    begin
+      SetString(Result, Buffer, BufferSize div SizeOf(Char));
+    end
+    else
+      raise Exception.Create('Failed to get font resource info');
+  finally
+    // Remove font resource
+    RemoveFontResourceEx(FontPath, FR_PRIVATE, nil);
+  end;
+end;
+
+procedure TMainView.Btn_ExtractFontNameClick(Sender: TObject);
+var
+  L_FontName: string;
+begin
+
+  if FileOpenDlg_Font.Execute then begin
+    L_FontName := GetFontNameFromFile(FileOpenDlg_Font.FileName);
+    Lbl_FName.Caption := 'Font Name: ' + L_FontName;
+  end;
+
+end;
+
+end.

@@ -1,0 +1,70 @@
+object MainView: TMainView
+  Left = 0
+  Top = 0
+  Caption = 'MainView'
+  ClientHeight = 201
+  ClientWidth = 447
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -19
+  Font.Name = 'Bahnschrift SemiLight SemiConde'
+  Font.Style = []
+  Font.Quality = fqClearTypeNatural
+  OldCreateOrder = False
+  PixelsPerInch = 96
+  TextHeight = 23
+  object Lbl_FName: TLabel
+    Left = 64
+    Top = 112
+    Width = 82
+    Height = 23
+    Caption = 'Lbl_FName'
+  end
+  object Lbl_1: TLabel
+    Left = 216
+    Top = 160
+    Width = 57
+    Height = 40
+    Caption = 'Lbl_1'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -19
+    Font.Name = 'Noto Sans Arabic Condensed'
+    Font.Style = []
+    Font.Quality = fqClearTypeNatural
+    ParentFont = False
+  end
+  object Btn_ExtractFontName: TButton
+    Left = 16
+    Top = 24
+    Width = 169
+    Height = 57
+    Cursor = crHandPoint
+    Caption = 'Extract Font Name'
+    TabOrder = 0
+    OnClick = Btn_ExtractFontNameClick
+  end
+  object FileOpenDlg_Font: TFileOpenDialog
+    DefaultFolder = '.\'
+    FavoriteLinks = <>
+    FileNameLabel = 'Font Path'
+    FileTypes = <
+      item
+        DisplayName = 'True Type Font'
+        FileMask = '*.ttf'
+      end
+      item
+        DisplayName = 'Open Type Font'
+        FileMask = '*.otf'
+      end
+      item
+        DisplayName = 'All'
+        FileMask = '*.ttf,*.otf'
+      end>
+    FileTypeIndex = 3
+    Options = []
+    Left = 312
+    Top = 24
+  end
+end

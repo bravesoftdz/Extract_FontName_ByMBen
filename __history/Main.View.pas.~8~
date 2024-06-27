@@ -1,0 +1,91 @@
+unit Main.View;
+
+interface
+
+uses
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs, Vcl.StdCtrls;
+
+type
+  TMainView = class(TForm)
+    Btn_ExtractFontName: TButton;
+    FileOpenDlg_Font: TFileOpenDialog;
+    Lbl_FName: TLabel;
+    procedure Btn_ExtractFontNameClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  MainView: TMainView;
+
+implementation
+
+{$R *.dfm}
+
+function GetFontName(const FontFileName: string): string;
+var
+  FS: TFileStream;
+  Buffer: array of Byte;
+  NameTableOffset, NameCount, StringOffset, i: Word;
+  NameRecord: array[0..11] of Byte;
+  PlatformID, EncodingID, LanguageID, NameID, Length, Offset: Word;
+begin
+  Result := '';
+  FS := TFileStream.Create(FontFileName, fmOpenRead or fmShareDenyWrite);
+  try
+    SetLength(Buffer, FS.Size);
+    FS.ReadBuffer(Buffer[0], FS.Size);
+
+    // Find the 'name' table offset
+    if (Buffer[0] = $00) and (Buffer[1] = $01) and (Buffer[2] = $00) and (Buffer[3] = $00) then
+    begin
+      NameTableOffset := PWord(@Buffer[12 + (6 * 4)])^;
+      NameCount := PWord(@Buffer[NameTableOffset + 2])^;
+      StringOffset := PWord(@Buffer[NameTableOffset + 4])^;
+
+      for i := 0 to NameCount - 1 do
+      begin
+        Move(Buffer[NameTableOffset + 6 + (i * 12)], NameRecord[0], 12);
+        PlatformID := PWord(@NameRecord[0])^;
+        EncodingID := PWord(@NameRecord[2])^;
+        LanguageID := PWord(@NameRecord[4])^;
+        NameID := PWord(@NameRecord[6])^;
+        Length := PWord(@NameRecord[8])^;
+        Offset := PWord(@NameRecord[10])^;
+
+        if (PlatformID = 3) and (EncodingID = 1) and (LanguageID = $0409) and (NameID = 1) then
+        begin
+          SetLength(Result, Length div 2);
+          Move(Buffer[NameTableOffset + StringOffset + Offset], PChar(Result)^, Length);
+          Exit;
+        end;
+      end;
+    end;
+  finally
+    FS.Free;
+  end;
+end;
+
+procedure TMainView.Btn_ExtractFontNameClick(Sender: TObject);
+var
+  L_FontName: string;
+begin
+
+  if FileOpenDlg_Font.Execute then begin
+    L_FontName := GetFontName(FileOpenDlg_Font.FileName);
+    Lbl_FName.Caption := 'Font Name: ' + L_FontName;
+  end;
+
+end;
+
+end.

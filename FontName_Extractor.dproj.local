@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899-12-30 00:00:00.000.731,=D:\Projects\Unit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.642,=D:\Projects\Unit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.128,=D:\Projects\Unit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.391,=D:\Projects\Unit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.802,=D:\Projects\ServerContainerUnit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.790,=D:\Projects\ServerMethodsUnit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.147,=D:\Projects\Unit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.337,=D:\Projects\Unit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.882,=D:\Projects\Unit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.998,=D:\Projects\Unit1.pas</Transaction>
+    <Transaction>1899-12-30 00:00:00.000.977,=D:\Projects\Unit1.pas</Transaction>
+    <Transaction>2024-06-27 05:12:47.664,=D:\Projects\Unit1.pas</Transaction>
+    <Transaction>2024-06-27 05:23:42.864,D:\Projects\GPL\ExtractFontName\Main.View.dfm=D:\Projects\Unit1.dfm</Transaction>
+    <Transaction>2024-06-27 05:23:42.864,D:\Projects\GPL\ExtractFontName\Main.View.pas=D:\Projects\Unit1.pas</Transaction>
+    <Transaction>2024-06-27 05:24:04.466,D:\Projects\GPL\ExtractFontName\FontName_Extractor.dproj=D:\Projects\Project1.dproj</Transaction>
+  </Transactions>
+</BorlandProject>

@@ -1,0 +1,133 @@
+unit Main.View;
+
+interface
+
+uses
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs, Vcl.StdCtrls;
+
+type
+  TMainView = class(TForm)
+    Btn_ExtractFontName: TButton;
+    FileOpenDlg_Font: TFileOpenDialog;
+    Lbl_FName: TLabel;
+    procedure Btn_ExtractFontNameClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  MainView: TMainView;
+
+implementation
+
+{$R *.dfm}
+
+//function GetFontNameFromFile(const FontFileName: string): string;
+//var
+//  FontPath: PChar;
+//  Buffer: array[0..255] of Char;
+//  BufferSize: DWORD;
+//  FontCount: Integer;
+//begin
+//  Result := '';
+//  FontPath := PChar(FontFileName);
+//
+//  // Add font resource
+//  FontCount := AddFontResourceEx(FontPath, FR_PRIVATE, nil);
+//  if FontCount = 0 then
+//    raise Exception.Create('Failed to add font resource');
+//
+//  try
+//    BufferSize := SizeOf(Buffer);
+//    if GetFontResourceInfoW(FontPath, BufferSize, @Buffer, GFRI_DESCRIPTION) then
+//    begin
+//      SetString(Result, Buffer, BufferSize div SizeOf(Char));
+//    end
+//    else
+//      raise Exception.Create('Failed to get font resource info');
+//  finally
+//    // Remove font resource
+//    RemoveFontResourceEx(FontPath, FR_PRIVATE, nil);
+//  end;
+//end;
+
+function GetFontNameFromFile(const FontFileName: string): string;
+var
+  DC: HDC;
+  Buffer: array of Byte;
+  BufferSize: DWORD;
+  Table: array[0..3] of AnsiChar;
+  Start, Count: DWORD;
+  NameID, Length, Offset, PlatformID, EncodingID, LanguageID: Word;
+  i: Integer;
+  NameBytes: TBytes;
+  FontName: WideString;
+  TempFontPath: PChar;
+begin
+  Result := '';
+  TempFontPath := PChar(FontFileName);
+  if AddFontResourceEx(TempFontPath, FR_PRIVATE, nil) = 0 then
+    raise Exception.Create('Failed to add font resource');
+
+  DC := GetDC(0);
+  try
+    Table := 'name';
+    BufferSize := GetFontData(DC, DWORD(Table), 0, nil, 0);
+    if BufferSize = GDI_ERROR then
+      raise Exception.Create('Failed to get font data');
+
+    SetLength(Buffer, BufferSize);
+    if GetFontData(DC, DWORD(Table), 0, @Buffer[0], BufferSize) = GDI_ERROR then
+      raise Exception.Create('Failed to read font data');
+
+    Start := PWord(@Buffer[4])^; // Offset to start of name table
+    Count := PWord(@Buffer[6])^; // Number of name records
+
+    for i := 0 to Count - 1 do
+    begin
+      PlatformID := PWord(@Buffer[Start + 6 + (i * 12) + 0])^;
+      EncodingID := PWord(@Buffer[Start + 6 + (i * 12) + 2])^;
+      LanguageID := PWord(@Buffer[Start + 6 + (i * 12) + 4])^;
+      NameID := PWord(@Buffer[Start + 6 + (i * 12) + 6])^;
+      Length := PWord(@Buffer[Start + 6 + (i * 12) + 8])^;
+      Offset := PWord(@Buffer[Start + 6 + (i * 12) + 10])^;
+
+      if (PlatformID = 3) and (EncodingID = 1) and ((LanguageID = $0409) or (LanguageID = $0401)) and (NameID = 1) then
+      begin
+        SetLength(NameBytes, Length);
+        Move(Buffer[Start + Offset + 6], NameBytes[0], Length);
+        FontName := TEncoding.Unicode.GetString(NameBytes);
+        Result := FontName;
+        Break;
+      end;
+    end;
+  finally
+    ReleaseDC(0, DC);
+    RemoveFontResourceEx(TempFontPath, FR_PRIVATE, nil);
+  end;
+end;
+
+
+procedure TMainView.Btn_ExtractFontNameClick(Sender: TObject);
+var
+  L_FontName: string;
+begin
+
+  if FileOpenDlg_Font.Execute then begin
+    L_FontName := GetFontNameFromFile(FileOpenDlg_Font.FileName);
+    Lbl_FName.Caption := 'Font Name: ' + L_FontName;
+  end;
+
+end;
+
+end.
